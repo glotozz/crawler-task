@@ -44,7 +44,7 @@ def parse_page3(res):
     return result
 
 header = ["place","job","salary","company","welfare"]
-csvfile = open('data.csv', 'w')
+csvfile = open('data.csv', 'w',newline='')
 writer = csv.writer(csvfile)
 writer.writerow(header)
 
