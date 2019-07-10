@@ -11,9 +11,7 @@ from bs4 import BeautifulSoup
 headers = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"}
 s = requests.session()
 
-def write_to_file(info):
-    with open("a.txt","a",encoding="utf-8") as f:
-        f.write(json.dumps(info,ensure_ascii=False,indent=2))
+f = open("data.json","a",encoding='utf-8')
 
 def get_one_page(url):
     try:
@@ -23,6 +21,7 @@ def get_one_page(url):
     except:
         return "爬取失败"
 
+import pandas as pd
 
 def parse_page3(res):
     html = BeautifulSoup(res,"html.parser")
@@ -41,10 +40,19 @@ def parse_page3(res):
             "company":company.get_text(),
             "welfare":welfare.get_text()
             })
+    #储存为json文件
+    f.write(json.dumps(result,indent=2,ensure_ascii=False))
+    #储存为csv文件(pandas)
+    df = pd.DataFrame(result)
+    df.to_csv('data2.csv',index=False,sep=',',mode='a')
+    #储存为excel文件
+    df = pd.DataFrame(result)
+    df.to_csv('data3.xls',index=False,sep=' ',mode='a',encoding='utf-8_sig')
     return result
 
+
 header = ["place","job","salary","company","welfare"]
-csvfile = open('data.csv', 'w',newline='')
+csvfile = open('data.csv', 'w',newline="")
 writer = csv.writer(csvfile)
 writer.writerow(header)
 
@@ -53,7 +61,7 @@ def main(offset):
     url="https://hz.58.com/ywtzjingli/pn"+str(offset)+"/?classpolicy=main_null,job_A&final=1&jump=1&PGTID=0d35f8c7-0004-f4fa-d607-70e9d941aa91&ClickID=2"
     html=get_one_page(url)
     result=parse_page3(html)
-    print(result)
+    #print(result)
     tmp1 = []
     for dic in result:
         print(dic)
@@ -65,7 +73,7 @@ def main(offset):
         tmp.append(dic['welfare'])
         print(tmp)
         tmp1.append(tmp)
-    writer.writerows(tmp1)
+    
 
 if __name__ == '__main__':
     for i in range(1,4):
